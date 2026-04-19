@@ -6,9 +6,9 @@ import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import ThemeToggle from '@/components/layout/ThemeToggle'
 
 export const metadata: Metadata = {
-  title: 'Guide Artisan Pro — Créez des sites vitrines professionnels',
+  title: 'DESCODES — Générateur de sites artisans',
   description:
-    'Guide pas-à-pas interactif pour créer des sites vitrines pour artisans. Packs Starter, Artisan et Business.',
+    'Générez un site vitrine professionnel pour artisans en quelques minutes grâce à l\'IA. Packs Starter, Artisan et Business.',
 }
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" data-theme="dark" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
           <ThemeToggle />

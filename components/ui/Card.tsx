@@ -1,13 +1,25 @@
-import { ReactNode } from 'react'
+import { ReactNode, CSSProperties } from 'react'
 
 interface CardProps {
   children: ReactNode
   className?: string
+  style?: CSSProperties
 }
 
-export default function Card({ children, className = '' }: CardProps) {
+export default function Card({ children, className = '', style }: CardProps) {
   return (
-    <div className={`bg-white border border-[#f0e5d8] rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-6 hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] transition-shadow ${className}`}>
+    <div
+      className={className}
+      style={{
+        backgroundColor: 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        boxShadow: 'var(--shadow-soft)',
+        padding: '1.5rem',
+        transition: 'box-shadow 0.2s ease',
+        ...style,
+      }}
+    >
       {children}
     </div>
   )

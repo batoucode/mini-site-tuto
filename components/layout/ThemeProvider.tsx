@@ -10,7 +10,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
+  theme: 'dark',
   toggleTheme: () => {},
 })
 
@@ -19,14 +19,14 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
+  const [theme, setTheme] = useState<Theme>('dark')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const saved = localStorage.getItem('batou-theme') as Theme | null
+    const saved = localStorage.getItem('descodes-theme') as Theme | null
     const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    const initialTheme = saved || system
+    const initialTheme = saved ?? system
     setTheme(initialTheme)
     document.documentElement.setAttribute('data-theme', initialTheme)
   }, [])
@@ -34,11 +34,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     const newTheme: Theme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
-    localStorage.setItem('batou-theme', newTheme)
+    localStorage.setItem('descodes-theme', newTheme)
     document.documentElement.setAttribute('data-theme', newTheme)
   }
 
-  // Évite le flash lors du rendu serveur
   if (!mounted) {
     return <>{children}</>
   }
