@@ -1,92 +1,119 @@
-# Guide Artisan Pro — Mini-site tutoriel interactif
+# Atelier Numérique — Plateforme de génération de sites artisanaux
 
-Guide pas-à-pas pour créer des sites vitrines pour artisans.
-Progression sauvegardée dans localStorage, code copiable, dark/light mode.
+Outil interne pour générer des sites vitrines professionnels pour artisans via Claude Code.
+Le générateur produit un prompt structuré que l'IA transforme en site complet prêt à déployer.
 
-## Stack technique
+**Production** → https://mini-site-tuto.vercel.app
 
-- **Next.js 15** (App Router)
-- **TypeScript** strict
-- **Tailwind CSS** avec dark mode `class`
-- **Zod** pour la validation
-- Aucune base de données (localStorage uniquement)
+---
 
-## Démarrage rapide
+## Stack
+
+| Technologie | Usage |
+|---|---|
+| Next.js 15 App Router | Framework frontend |
+| TypeScript strict | Typage statique |
+| Tailwind CSS | Styles utilitaires |
+| localStorage | Persistance (aucune BDD) |
+| Vercel | Déploiement continu |
+
+## Démarrage
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
+npm run build      # Build de production
 ```
 
-Ouvre [http://localhost:3000](http://localhost:3000).
+## Routes
+
+| Route | Description |
+|---|---|
+| `/` | Accueil — 2 CTAs + explications |
+| `/generateur` | Formulaire → prompt Claude Code |
+| `/tutoriels/[pack]` | Guide pas-à-pas (starter / artisan / business) |
+| `/options` | Catalogue des 8 options disponibles |
+| `/charte-de-couleurs` | Design system DESCODES |
 
 ## Structure
 
 ```
 mini-site-tuto/
 ├── app/
-│   ├── layout.tsx           ← Layout racine + ThemeProvider
-│   ├── page.tsx             ← Homepage avec les 3 packs
-│   ├── not-found.tsx        ← Page 404
-│   ├── pack/[slug]/
-│   │   └── page.tsx         ← Page de chaque pack (Starter/Artisan/Business)
-│   └── options/
-│       └── page.tsx         ← Page toutes les options
+│   ├── layout.tsx                  ← Layout racine + ThemeProvider + ThemeToggle
+│   ├── globals.css                 ← Variables CSS, fond, polices (Playfair + Inter)
+│   ├── page.tsx                    ← Accueil (hero + 3 étapes + stats)
+│   ├── generateur/page.tsx         ← Formulaire de génération de prompt
+│   ├── tutoriels/[pack]/page.tsx   ← Guide interactif StepWizard par pack
+│   ├── options/page.tsx            ← Liste des options disponibles
+│   ├── charte-de-couleurs/page.tsx ← Design system DESCODES
+│   └── not-found.tsx               ← Page 404
 ├── components/
-│   ├── ui/
-│   │   ├── ThemeToggle.tsx  ← Interrupteur dark/light
-│   │   ├── ProgressBar.tsx  ← Barre de progression
-│   │   └── CodeBlock.tsx    ← Bloc de code + bouton copier
-│   ├── features/
-│   │   ├── PackCard.tsx     ← Carte pack sur l'accueil
-│   │   ├── StepWizard.tsx   ← Guide pas-à-pas principal
-│   │   ├── PriceCalculator.tsx ← Calculateur de prix sticky
-│   │   └── Checklist.tsx    ← Checklist de validation finale
+│   ├── ui/                         ← Primitives réutilisables
+│   │   ├── Button.tsx              ← Bouton (variant: primary | outline)
+│   │   ├── Card.tsx                ← Carte (wrapper avec ombre et bordure)
+│   │   ├── CodeBlock.tsx           ← Bloc de code + copie presse-papier
+│   │   ├── ProgressBar.tsx         ← Barre de progression ARIA
+│   │   └── ThemeToggle.tsx         ← Interrupteur dark/light (footer)
+│   ├── features/                   ← Composants métier
+│   │   ├── PackCard.tsx            ← Carte pack sur l'accueil
+│   │   ├── StepWizard.tsx          ← Guide pas-à-pas interactif principal
+│   │   ├── PriceCalculator.tsx     ← Calculateur de prix sticky (sidebar)
+│   │   └── Checklist.tsx           ← Checklist de validation finale
 │   └── layout/
-│       ├── ThemeProvider.tsx ← Contexte dark/light mode
-│       ├── Navbar.tsx       ← Navigation sticky responsive
-│       └── Footer.tsx       ← Pied de page + ThemeToggle
+│       ├── Navbar.tsx              ← Navigation sticky responsive
+│       ├── Footer.tsx              ← Pied de page
+│       ├── ThemeProvider.tsx       ← Contexte React dark/light
+│       └── ThemeToggle.tsx         ← Bouton pill fixe (overlay)
 ├── lib/
-│   ├── constants.ts         ← Tous les packs, étapes, options
-│   └── utils.ts             ← localStorage, clipboard, formatPrice
-└── public/
+│   ├── constants.ts                ← Données: PACKS, OPTIONS, STEPS (~3000 lignes)
+│   ├── theme.ts                    ← Design tokens: couleurs, polices, ombres
+│   ├── storage.ts                  ← localStorage projet courant (générateur)
+│   ├── promptBuilder.ts            ← Construction du prompt Claude Code
+│   └── utils.ts                    ← localStorage tutoriels, clipboard, formatPrice
+└── docs/                           ← Documentation technique des modules
 ```
 
-## Fonctionnalités
+## Workflow utilisateur
 
-- ✅ **3 packs** : Starter (790€), Artisan (1390€), Business (2190€)
-- ✅ **8 étapes** par pack avec objectif, actions, commandes, code et résultat
-- ✅ **Navigation** : prev/next, points de navigation cliquables
-- ✅ **Blocage** : impossible de passer à l'étape suivante sans cocher
-- ✅ **Progression** : sauvegardée dans localStorage, reprise possible
-- ✅ **Code copiable** : bouton "Copier" avec feedback visuel
-- ✅ **Aide contextuelle** : section dépliable `<details>` par étape
-- ✅ **Dark/Light mode** : interrupteur dans le footer, sauvegardé
-- ✅ **Calculateur de prix** : sidebar sticky avec 8 options
-- ✅ **Checklist finale** : validation avant livraison
-- ✅ **Responsive** : mobile, tablette, desktop
+```
+/generateur
+  → Formulaire (entreprise + pack + options + design)
+  → Prompt auto-généré en temps réel
+  → Copie dans Claude Code
+  → Site artisanal généré et déployé sur Vercel
+```
 
-## Personnalisation
+## Design
 
-### Modifier le contenu des packs
-Édite `lib/constants.ts` — les tableaux `STARTER_STEPS`, `ARTISAN_STEPS`, `BUSINESS_STEPS`.
+Palette vert sauge & blanc cassé. Voir `lib/theme.ts` pour les tokens.
+Design system DESCODES disponible à `/charte-de-couleurs`.
 
-### Modifier les options
-Édite le tableau `OPTIONS` dans `lib/constants.ts`.
+Pour personnaliser:
 
-### Modifier les couleurs
-Édite les variables CSS dans `app/globals.css`.
+```ts
+// lib/theme.ts
+colors.primary = '#5a7c5a'   // couleur principale
+colors.background = '#fef9f0' // fond page
+```
+
+## Documentation modules
+
+Voir [`docs/`](./docs/README.md) pour la documentation détaillée de chaque module.
 
 ## Déploiement
 
 ```bash
-# Build de production
-npm run build
+# Le token GitHub est dans /home/batou/.token
+TOKEN=$(grep "GITHUB_TOKEN:" /home/batou/.token | awk '{print $2}')
+git remote set-url origin "https://$TOKEN@github.com/batoucode/mini-site-tuto.git"
+git push origin main
+git remote set-url origin "https://github.com/batoucode/mini-site-tuto.git"
 
-# Déploiement Vercel (après git push)
-git add . && git commit -m "feat: guide artisan pro" && git push
+# Vercel (auto-détecte Next.js)
+vercel deploy --prod
 ```
 
 ---
 
-**Usage interne** — Progression sauvegardée uniquement en local (localStorage).
+Usage interne BATOUCODE. Aucune base de données. Tout est en localStorage.
